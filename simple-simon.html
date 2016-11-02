@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en"></html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <script   src="js/jquery-3.1.1.js"   integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="   crossorigin="anonymous"></script>
+        <script src="js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+    <main class="container-fluid col-sm-6 col-sm-offset-3 grey">
+        <div class="panel grey">
+            <form class="panel panel-body grey">
+                <div class=""></div>
+                <input type="button"  class="col-sm-6 button btn btn-danger" value="red" id="red" onclick="onPress(this.value)">
+                <div class=""></div>
+                <input type="button"  class="col-sm-6 button btn btn-info" value="blue" id="blue" onclick="onPress(this.value)">
+                <div class=""></div>
+                <input type="button"  class="col-sm-6 button btn btn-success" value="green" id="green" onclick="onPress(this.value)">
+                <div class=""></div>
+                <input type="button"  class="col-sm-6 button btn btn-warning" value="orange" id="orange" onclick="onPress(this.value)">
+            </form>
+            <div class="startPanel panel panel-body grey">
+                <p class="startDisplay col-sm-8 col-sm-offset-2">test</p>
+                <button class="btn btn-default col-sm-6 col-sm-offset-3" value="start" onclick="onPress(this.value)">start</button>
+            </div>
+            <p id="speedMult"></p>
+            <p id="round"></p>
+            <p id="userScore"></p>
+
+        </div>
+    </main>
+    <style>
+        html {
+            background-image: url('img/imgres.png');
+        }
+        p {
+            color: #31b0d5;
+            font-weight: bold;
+        }
+        .button {
+            height: 200px;
+
+        }
+        .startPanel {
+            text-align: center;
+        }
+        @media only screen and (max-width: 768px) {
+            /* For mobile phones: */
+            [class*="col-"] {
+                width: 100%;
+            }
+            [class*='button btn'] {
+                float: left;
+                width: 50%;getr
+
+            }
+        }
+        [class*='grey'] {
+            background-color: #3c3c3c;
+
+        }
+    </style>
+    <script>
+        //comment to change cgan
+
+        'use strict';
+        var isPlaying = false;
+        var houseArray = [];
+        var userArray = [];
+        var houseTurn = false;
+        var userTurn = false;
+        var skillMultiplier = .01;
+        var y = 0;
+        var userScore = 0;
+
+        function onPress(userInput) {
+            $('#userScore').text('Score: ' + userScore.toFixed(2));
+            if (!isPlaying) {
+                if (userInput == 'start') {
+                    $('.startDisplay').text('New Game');
+                    setTimeout(function () {
+                        $('.startDisplay').text('House turn');
+                    },500);
+                    isPlaying = true;
+                    houseTurn = true;
+                } else {
+                    $('.startDisplay').text('game is not started');
+                }
+            } if (isPlaying) {
+                if (houseTurn) {
+                    y++;
+                    $('#speedMult').text('Score/Speed Multiplier: ' + skillMultiplier.toFixed(3));
+                    $('#round').text('Round: ' + y);
+                    houseArray = ranColorAddToHouseArray(houseArray);
+                    highlightHouseArray(houseArray);
+                    houseTurn = false;
+                    userTurn = true;
+                    userArray = [];
+                    console.log(houseArray);
+
+                }  else if (userTurn) {
+                    if (userInput == 'start') {
+                        $('.startDisplay').text('New Game');
+                        setTimeout(onStart(),500);
+                    }
+                    if (isColor(userInput)) {
+                        $('.startDisplay').text(userInput);
+                        var i = (userArray.length);
+                        if  (userInput == houseArray[i]) {
+                            userArray.push(userInput);
+                            $('.startDisplay').text('+' + (10 + (skillMultiplier * 10)).toFixed(2) + '!');
+                            userScore +=  10 + (skillMultiplier * 10);
+                            $('#userScore').text('Score: ' + userScore);
+                            if (userArray.length == houseArray.length) {
+                                userTurn = false;
+                                houseTurn = true;
+                                userArray = [];
+                                userScore +=  100 + (skillMultiplier * 10);
+                                setTimeout(function () {
+                                    $('.startDisplay').text('good Job! ' + (100 + (skillMultiplier * 10)).toFixed(2));
+                                },500);
+                                setTimeout(function () {
+                                    $('.startDisplay').text('House turn');
+                                },1000);
+                                onPress();
+                            }
+                        } else if (userInput != houseArray[i]) {
+                            onStart();
+                            isPlaying = false;
+                            houseTurn = false;
+                            userTurn = false;
+                            houseArray = [];
+
+                            $('.startDisplay').text('game over');
+                            setTimeout(function () {
+                                $('.startDisplay').text('You Lose, Try Agian?');
+                            },500);
+                        }
+
+
+                    }
+                }
+            }
+            if (skillMultiplier < .9) {
+                skillMultiplier += .005;
+            }
+        }
+
+
+        function isColor(input) {
+            if (input == 'red') {
+                $('input#red').toggleClass('active');
+                return true;
+            } else if (input == 'blue') {
+                $('input#blue').toggleClass('active');
+                return true;
+            } else if (input == 'green') {
+                $('input#green').toggleClass('active');
+                return true;
+            } else if (input == 'orange') {
+                $('input#orange').toggleClass('active');
+                return true;
+            } else {
+                return false;
+            }
+        }
+        function highlightHouseArray(houseArray) {
+            var i = 0;
+            var interval = setInterval(function () {
+                highlightButton(houseArray[i]);
+                i++;
+                if (i >= houseArray.length) {
+                    clearInterval(interval);
+                    setTimeout(function () {
+                        $('.startDisplay').text('Your Turn!');
+                    },1000);
+                }
+            },  1000 - (1000 * skillMultiplier));
+        }
+        function highlightButton(color) {
+            if (color == 'red') {
+                $('input#red').animate({
+                    opacity: .25
+                }, 500 - (500 * skillMultiplier)).animate({
+                    opacity: 1
+                }, 500 - (500 * skillMultiplier));
+            } else if (color == 'blue') {
+                $('input#blue').animate({
+                    opacity: .25
+                }, 500 - (500 * skillMultiplier)).animate({
+                    opacity: 1
+                }, 500 - (500 * skillMultiplier));
+            } else if (color == 'green') {
+                $('input#green').animate({
+                    opacity: .25
+                }, 500 - (500 * skillMultiplier)).animate({
+                    opacity: 1
+                }, 500 - (500 * skillMultiplier));
+            } else if (color == 'orange') {
+                $('input#orange').animate({
+                    opacity: .25
+                }, 500 - (500 * skillMultiplier)).animate({
+                    opacity: 1
+                }, 500 - (500 * skillMultiplier));
+            }
+        }
+
+
+
+        function ranColorAddToHouseArray(inputArray) {
+            var randColor = Math.floor(Math.random() * 4);
+            if (randColor == 0) {
+                inputArray.push('red');
+            } else if (randColor == 1) {
+                inputArray.push('blue');
+            } else if (randColor == 2) {
+                inputArray.push('green');
+            } else if (randColor == 3) {
+                inputArray.push('orange');
+            }
+            return inputArray;
+        }
+
+
+
+
+
+
+
+        function onStart() {
+            y = 0;
+            isPlaying = false;
+            houseArray = [];
+            userArray = [];
+            houseTurn = false;
+            userTurn = false;
+            skillMultiplier = .01;
+        }
+
+        //function to highlight button on pattern and press
+
+
+
+
+
+    </script>
+    </body>
+</html>
