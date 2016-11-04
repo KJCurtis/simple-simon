@@ -23,7 +23,7 @@
                 <input type="button"  class="col-sm-6 button btn btn-warning" value="orange" id="orange" onclick="onPress(this.value)">
             </form>
             <div class="startPanel panel panel-body grey">
-                <p class="startDisplay col-sm-8 col-sm-offset-2">test</p>
+                <p class="startDisplay col-sm-8 col-sm-offset-2">Simon Says</p>
                 <button class="btn btn-default col-sm-6 col-sm-offset-3" value="start" onclick="onPress(this.value)">start</button>
             </div>
             <p id="speedMult"></p>
@@ -96,8 +96,8 @@
                     houseArray = ranColorAddToHouseArray(houseArray);
                     highlightHouseArray(houseArray);
                     houseTurn = false;
-                    userTurn = true;
                     userArray = [];
+                    userTurn = true;
                     console.log(houseArray);
 
                 }  else if (userTurn) {
@@ -112,7 +112,7 @@
                             userArray.push(userInput);
                             $('.startDisplay').text('+' + (10 + (skillMultiplier * 10)).toFixed(2) + '!');
                             userScore +=  10 + (skillMultiplier * 10);
-                            $('#userScore').text('Score: ' + userScore);
+                            $('#userScore').text('Score: ' + userScore.toFixed(2));
                             if (userArray.length == houseArray.length) {
                                 userTurn = false;
                                 houseTurn = true;
